@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/gingerc/MemoryBox#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "pg": "^7.10.0"
   }
 }
