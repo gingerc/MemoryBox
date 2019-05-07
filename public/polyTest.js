@@ -179,59 +179,6 @@
     
 } );
 
-
-// button.click();
-
-
-
-//  //usual 3D variables
-//  let scene;
-//  let camera3D;
-//  let renderer;
-
-//  let things = [];   // poly objects
-//  var keyword;
-
-//  //like draw
-//  var animate = function () {
-//      //recursively call this function is a way that the renderer does it in a smart way
-//      requestAnimationFrame(animate);
-//      keyword = document.getElementById("userInput").value;
-//      //animate the poly objects in the things array
-//      for (var i = 0; i < things.length; i++) {
-//          things[i].position.z -= 1;
-//          if (things[i].position.z < -400) {
-//              things[i].position.z = 400;
-//          }
-//  };
-// }
-
-//  function setup() {
-//      //same as init but some p5 stuff needs to be called from setup
-//      console.log("setup");
-     
-//      //searchPoly(keyword);
-     
-//  }
-
-//  //like setup
-//  function init() {
-//      //console.log("initializing three.js")
-//      basic3DStuff()
-
-//      //loadModel('/osc_body/obj/female02/female02.obj', -90,0,0);
-//      //loadModel('/osc_body/obj/male02/male02.obj', 90, 0, 0);
-//  }
-
-//  init();  //like setup but you have to call it yourself
-//  animate();  //like draw you have to kick start and then it calls itself
-
-//  function GoSearch(){  
-//      //console.log(document.getElementById("userInput").value);
-//      searchPoly(keyword);
-//  }
-
-
 //set up three.js loading utility
 function loadModel(asset) {
 
@@ -360,29 +307,13 @@ function getRandomFloat(min, max) {
 
 
 
-//         function basic3DStuff() {
-//             console.log("adding 3D stuff")
-//             //all three.js programs have a scene, a camera and a renderer
-//             scene = new THREE.Scene();
-//             camera3D = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-//             renderer = new THREE.WebGLRenderer();
-//             renderer.setSize(window.innerWidth, window.innerHeight);
-//             camera3D.position.z = 350;
 
-//             // document.body.appendChild(renderer.domElement);
-//             //this puts the three.js stuff in a particular div
-//             document.getElementById('container').appendChild(renderer.domElement);
+function showFeedBox(){
+    $("#putInTheBox").toggleClass('show');
+    $("#feedBox").toggleClass('show');
+}
 
-//             //add some lights if you want
-//             var ambient = new THREE.HemisphereLight(0xbbbbff, 0x886666, 0.75);
-//             ambient.position.set(-0.5, 0.75, -1);
-//             scene.add(ambient);
-
-//             var light = new THREE.DirectionalLight(0xffffff, 0.75);
-//             light.position.set(1, 0.75, 0.5);
-//             scene.add(light);
-
-//         }
-
-          
-         
+function hideFeedBox(){
+    $("#putInTheBox").toggleClass('show');
+    $("#feedBox").toggleClass('show');
+}

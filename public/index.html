@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
-    <!-- <link rel="stylesheet" href="style.css"> -->
+    <script src="https://www.gstatic.com/firebasejs/6.0.0/firebase-app.js"></script>
     <style>
         /* @import url('https://fonts.googleapis.com/css?family=Montserrat'); */
         
@@ -28,6 +28,7 @@
             font-family: sans-serif;
             line-height: 24px;
             background: #222222;
+            overflow: hidden;
         }
         #search {
             position: absolute;
@@ -44,7 +45,7 @@
         #viewer {
             position: absolute;
             top: 12%;
-            left: 8px;
+            left: 150px;
             right: 8px;
             bottom: 8px;
         }
@@ -56,17 +57,108 @@
             border: none;
         }
 
+        #feedBox{
+          position: absolute;
+          color:#fff;
+          z-index: 99;
+          top: 2%;
+          right: 10%;
+          transition: all .75s ease;
+          opacity: 1;
+          width: 20%;
+        }
+
+        #putInTheBox{
+          opacity: 0;
+          transition: all .75s ease;
+          position: absolute;
+          z-index: 99;
+          top: 2%;
+          right: 5%;
+          width:20%;
+        }
+
+        #putInTheBox.show {
+        opacity: 1;
+        width: 60%;
+        }
+
+        #feedBox.show {
+        opacity: 0;
+        }
+
+        #Guesses{
+          position: absolute;
+          z-index: 99;
+          top: 2%;
+          left: 2%;
+          overflow: auto;
+          width: 25%;
+          text-align: center;
+        }
+
+        #Guesses h2, p{
+          font-family: 'Montserrat', sans-serif;
+          color:white;
+          padding: 10px;
+        }
+        #Guesses h2{
+          padding-bottom: 20px;
+        }
+
+        textarea {
+          margin-top: 50px;
+          width: 250px;
+          height: 150px;
+          padding: 10px;
+          font-size: 1em;
+          font-family: 'Montserrat', sans-serif;
+          background: purple;
+          opacity: 0.5;
+          border: none;
+          margin-bottom: 20px;
+          color: white;
+          border-radius: 10px;
+          line-height: 25px;
+        }
+
+        textarea::-webkit-input-placeholder {
+  color: #fff;
+  opacity: 0.5;
+}
+
+textarea:-moz-placeholder { /* Firefox 18- */
+  color: #fff;  
+  opacity: 0.5;
+}
+
+textarea::-moz-placeholder {  /* Firefox 19+ */
+  color: #fff;  
+  opacity: 0.5;
+}
+
+textarea:-ms-input-placeholder {
+  color: #fff;  
+  opacity: 0.5;
+}
+
+textarea::placeholder {
+  color: #fff;  
+  opacity: 0.7;
+}
+
         input:focus::-webkit-input-placeholder { color:transparent; }
         input:focus:-moz-placeholder { color:transparent; }
 
         h1 {
             font-family: 'Montserrat', sans-serif;
-            top:2%;
-            margin: 10px;
+            top:0%;
+            margin: 0px;
             margin-bottom: 10px;
             position: relative;
             display:block;
             text-align: center;
+            z-index: 99;
         }
         .button {
             font-family: 'Montserrat', sans-serif;
@@ -202,15 +294,37 @@ keyframes active {
 </head>
 
 <body>
-        <h1>Open Source Memory Box</h1>
-        <form id="search" action="post">
-                <input id="query" placeholder="feed me a memory object">
-                <button class="button" id="button"><span>Feed Memory</span></button>
- </div>
-            </form>
+        <button class="button" id="feedBox" onclick="showFeedBox()"> Put Memory Objects in this Memory Box </button>
+
+        <div id="putInTheBox">
+            <form id="search" >
+              <input name="userinput" id="query" placeholder="insert a memory object">
+              <button class="button" id="button" onclick="hideFeedBox()"><span>Feed Memory</span></button>
+          </form>
+        </div>
+
+       
+       
 
             <span id="viewer"></span>
-            <div id='p5Div'></div>
+            <div id="Guesses">
+                <h2>the memory in this box is...</h2>
+                {{#memories}}
+                <p>{{ guesses }}</p>
+                {{/memories}}
+                <!-- <p>I went to a school with a bird gate</p>
+                <p>I went to a school with a bird gate</p> -->
+                
+                
+                <form id="write" method="POST" action="/post">
+                  <textarea name="userguess" id="guess" placeholder="write down your interpretation of this memory"></textarea>
+                  
+                  <button type="submit" class="button" id="submitData"><span>Submit</span></button>
+              </form>
+            </div>
+
+
+
 <!-- 
         <input id="userInput" type="text">
         <input type="submit" onclick="GoSearch()"> -->
@@ -224,6 +338,22 @@ keyframes active {
     <script src="three.js/js/OrbitControls.js"></script>
 
     <script type="text/javascript" src="polyTest.js"></script> 
+    
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBcPak4-M-1GWb6bvwh99pfyvBLRCFPEmQ",
+        authDomain: "memorymuseum-1556035017932.firebaseapp.com",
+        databaseURL: "https://memorymuseum-1556035017932.firebaseio.com",
+        projectId: "memorymuseum-1556035017932",
+        storageBucket: "memorymuseum-1556035017932.appspot.com",
+        messagingSenderId: "107042482704",
+        appId: "1:107042482704:web:606f7ccdd10848f2"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    
 </body>
 
 </html>
