@@ -35,17 +35,16 @@ client.connect();
 var memories = [];
 
 app.get('/', (req, res) => {
-    try {
-        var result = client.query('SELECT * FROM memoryitem');
-        memories = result.rows;
-        res.render('public/index', {
-            memories
-    })
-    
-    } catch (err){
-        console.error(err);
-        res.send("Error" + err);
-    }
+    client.query('SELECT * FROM memoryitem', (err, resSQL) => {
+        if (err) {
+          console.log(err.stack)
+        } else {
+            let memories = resSQL.rows
+            res.render('public/index', {
+                memories
+            });
+        }
+      })
 })
 
 app.post('/post', function (req, res) {
