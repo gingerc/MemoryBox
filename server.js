@@ -63,3 +63,6 @@ app.post('/post', function (req, res) {
     }
     res.redirect('/');
 })
+
+  
+app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
