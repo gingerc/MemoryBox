@@ -34,9 +34,9 @@ client.connect();
 
 var memories = [];
 
-app.get('/', async (req, res) => {
+app.get('/', (req, res) => {
     try {
-      const result = await client.query('SELECT * FROM memoryitem');
+        var result = client.query('SELECT * FROM memoryitem');
         memories = result.rows;
         res.render('public/index', {
             memories
