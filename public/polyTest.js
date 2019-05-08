@@ -6,17 +6,40 @@
  var NEAR = 10;
  var FAR = 500;
 
- var camera, scene, renderer, container,light;
+ var camera, scene, renderer, container,light,clock, mixer;
  var cameraControls;
 
  var randomNumber;
 
- init();
- animate();
- 
+ var database;
+ var ref;
+ var loadingManager;
+
+
             
  function init(){
+
+    database = firebase.database();
+    ref = database.ref('memoryobjects/');
+
+    ref.once('value', gotData, err);
+    //console.log(database);
    
+
+
+    //loading
+      clock = new THREE.Clock();
+      loadingManager = new THREE.LoadingManager( () => {
+      
+          const loadingScreen = document.getElementById( 'loading-screen' );
+          loadingScreen.classList.add( 'fade-out' );
+          
+          // optional: remove loader from DOM via event listener
+          loadingScreen.addEventListener( 'transitionend', onTransitionEnd );
+          
+      } );
+
+
     //renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -89,11 +112,37 @@
     scene.add( planeLeft );
    
 
+
  }
 
  
+ init();
+ animate();
 
- 
+ function writeUserData(_objects, _assetInfo) {
+    firebase.database().ref('memoryobjects/').push({
+      object: _objects,
+      assetInfo: _assetInfo
+    });
+  }
+
+  function gotData(data){
+      
+      var memoryitems = data.val();
+      var keys = Object.keys(memoryitems);
+      //console.log(keys);
+      for (var i = 0; i < keys.length; i++){
+          var k = keys[i];
+          var objectNames = memoryitems[k].object;
+          var assetInformation = memoryitems[k].assetInfo;
+          loadModel( assetInformation ,getRandomFloat(-1.5,1.5));
+          console.log(objectNames);
+      }
+  }
+
+  function err(err){
+      console.log(err);
+  }
  
  function animate() {
 
@@ -111,6 +160,11 @@
     
      camera.lookAt( 0, 50, 0 );
 
+     const delta = clock.getDelta();
+
+	if ( mixer !== undefined ) mixer.update( delta );
+
+
      renderer.render( scene, camera );
      requestAnimationFrame( animate );
 
@@ -120,7 +174,7 @@
  
 
  
-
+ 
 
  // POLY REST API
 
@@ -160,7 +214,8 @@
         }
 
         console.log(asset);
-        loadModel( asset );
+        loadModel( asset, getRandomFloat(-1.5,1.5) );
+        writeUserData(query.value, asset);
     } else {
         //results.innerHTML = '<center>NO RESULTS</center>';
         alert("there is no model related to your search");
@@ -175,12 +230,21 @@
     event.preventDefault()
 
     searchPoly( query.value, onResults);
+    loadingManager = new THREE.LoadingManager( () => {
+      
+        const loadingScreen = document.getElementById( 'loading-screen' );
+        loadingScreen.classList.add( 'fade-out' );
+        
+        // optional: remove loader from DOM via event listener
+        loadingScreen.addEventListener( 'transitionend', onTransitionEnd );
+        
+    } );
     //randomNumber = Math.random(5);
     
 } );
 
 //set up three.js loading utility
-function loadModel(asset) {
+function loadModel(asset, xpos) {
 
     var format = asset.formats.find( format => { return format.formatType === 'OBJ'; } );
 
@@ -195,14 +259,14 @@ function loadModel(asset) {
 
     var path = obj.url.slice( 0, obj.url.indexOf( obj.relativePath ) );
 
-    var loader = new THREE.MTLLoader();
+    var loader = new THREE.MTLLoader(loadingManager);
 	loader.setCrossOrigin( true );
 	loader.setMaterialOptions( { ignoreZeroRGBs: true } );
     loader.setTexturePath( path );
 
     loader.load( mtl.url, function ( materials ) {
 
-        var loader = new THREE.OBJLoader();
+        var loader = new THREE.OBJLoader(loadingManager);
         loader.setMaterials( materials );
         loader.load( obj.url, function ( object ) {
 
@@ -213,21 +277,25 @@ function loadModel(asset) {
             // re-center
 
             var center = box.getCenter();
-            center.y = box.min.y - getRandomFloat(0.2,0.7);
-            center.x = getRandomFloat(-1.5,1.5);
-            center.z = getRandomFloat(-1.5,1.5);
-            object.position.sub( center);
+            
+            object.position.x = center.x + xpos;
+            object.position.y = center.y + getRandomFloat(1,3);
+            console.log(object.position.y );
+            object.position.z = center.z + xpos;
+           
+            object.rotation.y = Math.PI;
            // object.position.x = getRandomFloat(-3,3);
 
             // scale
 
             var scaler = new THREE.Group();
             scaler.add( object );
-            var rand = getRandomFloat(40,55);
-            scaler.scale.setScalar( rand / box.getSize().length() );
+            var rand = getRandomFloat(45,65);
+            scaler.scale.setScalar( rand/box.getSize().length());
             //console.log(box.getSize().length());
             container.add( scaler );
 
+        
         } );
 
     } );
@@ -237,7 +305,7 @@ function loadModel(asset) {
 
 
 function getRandomFloat(min, max) {
-    console.log(Math.random() * (max - min) + min);
+    //console.log(Math.random() * (max - min) + min);
     return Math.random() * (max - min) + min;
   }
 
@@ -318,5 +386,11 @@ function hideFeedBox(){
     $("#feedBox").toggleClass('show');
 }
 
-var randomColor = Math.floor(Math.random()*16777215).toString(16);
+// var randomColor = Math.floor(Math.random()*16777215).toString(16);
 
+function onTransitionEnd( event ) {
+
+	const element = event.target;
+	element.remove();
+	
+}
